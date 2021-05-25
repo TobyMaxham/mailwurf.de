@@ -71,7 +71,7 @@ class User extends Authenticatable
             return collect();
         }
 
-        $query = MailImport::forAccounts($accounts);
+        $query = MailImport::forAccounts($accounts, $this->username);
 
         return $query->get()->sortByDesc(fn($mail) => $mail->date->timestamp);
     }

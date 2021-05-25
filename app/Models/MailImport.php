@@ -29,6 +29,11 @@ class MailImport extends Model
         return $this->getEmailAddressFrom('from');
     }
 
+    public function getFromShortAttribute()
+    {
+        return $this->getEmailAddressFrom('from', true);
+    }
+
     public function getTextAttribute()
     {
         if ($this->message->hasHTMLBody()) {
@@ -42,6 +47,11 @@ class MailImport extends Model
         return $this->getEmailAddressFrom('to');
     }
 
+    public function getToShortAttribute()
+    {
+        return $this->getEmailAddressFrom('to', true);
+    }
+
     public function getCcDisplayAttribute()
     {
         return $this->getEmailAddressFrom('cc');
@@ -52,7 +62,7 @@ class MailImport extends Model
         return $this->getEmailAddressFrom('bcc');
     }
 
-    private function getEmailAddressFrom($type)
+    private function getEmailAddressFrom($type, bool $short = false)
     {
         $type = 'get' . ucfirst(strtolower($type));
         /** @var Attribute $mail */
@@ -63,8 +73,8 @@ class MailImport extends Model
             $mail = $mail ? $mail->all() : [];
         }
 
-        return implode(', ', array_map(function ($obj) {
-            return mb_decode_mimeheader($obj->full);
+        return implode(', ', array_map(function ($obj) use($short) {
+            return mb_decode_mimeheader($short ? $obj->mail : $obj->full);
         }, $mail));
     }
 
@@ -90,11 +100,11 @@ class MailImport extends Model
         return $this->message->getDate()->{'0'};
     }
 
-    public function scopeForAccounts(Builder $query, Collection $accounts)
+    public function scopeForAccounts(Builder $query, Collection $accounts, $username)
     {
         return $query->where('created_at', '>=', now()->subYear())
-            ->where(function ($query) use ($accounts) {
-                $query->orWhere('to', 'like', '%' . Str::lower($this->username . '%'));
+            ->where(function ($query) use ($accounts, $username) {
+                $query->orWhere('to', 'like', '%' . Str::lower($username) . '%');
                 $accounts->each(function ($account) use ($query) {
                     $query->orWhere('to', 'LIKE', "%{$account->mail}%")
                         ->orWhere('cc', 'LIKE', "%{$account->mail}%")

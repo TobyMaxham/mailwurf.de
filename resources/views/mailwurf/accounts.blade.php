@@ -76,7 +76,7 @@
                             <div class="col-md-4">
                                 <div class="input-group">
                                     <input id="mail" required name="email" class="form-control" placeholder="abc" type="text">
-                                    <span class="input-group-addon">@mailwurf.de</span>
+                                    <span class="input-group-addon">{{ '@'.config('mailwurf.main.domain') }}</span>
                                 </div>
                                 @error('email')
                                     <span class="help-block">{{ $message }}</span>

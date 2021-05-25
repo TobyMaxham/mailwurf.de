@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -58,4 +57,22 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function accounts()
+    {
+        return $this->hasMany(Account::class);
+    }
+
+    public function getMailImports()
+    {
+        $accounts = $this->accounts;
+
+        if (0 == $accounts->count()) {
+            return collect();
+        }
+
+        $query = MailImport::forAccounts($accounts);
+
+        return $query->get()->sortByDesc(fn($mail) => $mail->date->timestamp);
+    }
 }

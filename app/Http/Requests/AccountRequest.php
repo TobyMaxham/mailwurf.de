@@ -28,7 +28,7 @@ class AccountRequest extends FormRequest
         return [
             'email' => [
                 'required',
-                'alpha_num',
+                'string',
                 fn($attribute, $value, $fail) => $this->checkUnique($attribute, $value, $fail),
             ],
         ];
@@ -36,12 +36,20 @@ class AccountRequest extends FormRequest
 
     public function getMail()
     {
-        return Str::lower($this->get('email') . '@' . config('mailwurf.main.domain'));
+        $mail = Str::lower($this->get('email') . '@' . config('mailwurf.main.domain'));
+        $mail = str_replace([' '], '', $mail);
+
+        return $mail;
     }
 
     private function checkUnique($attribute, $value, $fail)
     {
         $mail = $this->getMail();
+
+        if(!filter_var($mail, FILTER_VALIDATE_EMAIL)) {
+            $fail("The mail {$mail} is not a valid address.");
+        }
+
         if(Account::where('mail', $mail)->exists()) {
             $fail("The mail {$mail} already exists.");
         }

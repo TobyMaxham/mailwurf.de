@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'auth:sanctum', 'verified'], function () {
 
     Route::get('/', fn() => redirect()->route('account.index'));
+    Route::get('/dashboard', fn() => redirect()->route('account.index'))->name('dashboard');
 
     /* Mail Routes */
     Route::get('/mail', [MailController::class, 'index'])->name('mail.index');
@@ -15,3 +16,9 @@ Route::group(['middleware' => 'auth:sanctum', 'verified'], function () {
     Route::get('/account', [AccountController::class, 'index'])->name('account.index');
     Route::post('/account', [AccountController::class, 'store'])->name('account.store');
 });
+
+Route::get('/logout', function () {
+    auth()->logout();
+
+    return redirect('/');
+})->name('logout');

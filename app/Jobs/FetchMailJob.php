@@ -63,6 +63,7 @@ class FetchMailJob implements ShouldQueue
         $import->mail_key = Str::random(64);
 
         $import->save();
+        $message->delete();
     }
 
     protected function extractMail($items)

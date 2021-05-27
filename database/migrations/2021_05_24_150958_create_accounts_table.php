@@ -19,10 +19,7 @@ class CreateAccountsTable extends Migration
             $table->string('mail');
             $table->unsignedInteger('count_all')->default(0);
 
-            $table->unsignedInteger('user_id');
-            $table->foreign('user_id')
-                ->references('id')->on('users')
-                ->onDelete('cascade');
+            $table->foreignId('user_id')->index();
 
             $table->timestamps();
             $table->softDeletes();
